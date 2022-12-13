@@ -1,0 +1,41 @@
+---
+- hosts: localhost
+  tasks:
+    - name: packages | ensure apt list dir exists
+      file:
+      path: /var/lib/apt/lists/
+      state: directory
+      mode: 0755
+      
+    - name: Install latest version of Apache
+      apt: name=apache2 update_cache=yes state=latest
+
+    - name: Create document root for your domain
+      file:
+        path: "/var/www/html/"
+        state: directory
+        owner: "root"
+        mode: '0755'
+
+    - name: Copy your index page
+      template:
+        src: "files/index.html.j2"
+        dest: "/var/www/html/index.html"
+
+    - name: Set up virtuahHost
+      template:
+        src: "files/apache.conf.j2"
+        dest: "/etc/apache2/sites-available/apache.conf"
+      notify: restart-apache
+
+    - name: "UFW firewall allow HTTP on port 80"
+      ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+
+  handlers:
+    - name: restart-apache
+      service:
+        name: apache2
+        state: restarted

@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Docker build') {
+            steps {
+                sh "cd demoproject/$Name"
+                sh "docker build -t $NAME:$BUILD_ID /var/lib/jenkins/workspace/de/demoproject/$Name/."
+                sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPO"
+                sh "docker tag $Name:$BUILD_ID $REPO:$BUILD_ID"
+            }
+                
+            }
+            stage('Docker push'){
+                steps{
+                sh "docker push $REPO:$BUILD_ID"
+            }
+            }
+            stage('Docker run'){
+                steps{
+                sh "docker run $Name:$BUILD_ID"
+            }
+            }
+        }
+}

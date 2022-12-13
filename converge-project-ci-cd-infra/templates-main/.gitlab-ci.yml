@@ -1,0 +1,10 @@
+include:
+  - project: 'humancloud/templates'
+    file: '/gitlab-namespace-ci.yaml'
+    when: manual
+
+include:
+  - project: 'humancloud/templates'
+    file: '/.gitlab-ci-hc-nginx-ingress.yaml'
+    when: manual
+

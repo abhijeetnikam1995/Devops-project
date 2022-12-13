@@ -1,0 +1,14 @@
+name: "converge-marketplace-dev"
+nameOverride: "converge-marketplace-dev"
+containerPort: 3000
+externalPort: 80
+secretName: "marketplace-imagepullsecret"
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: app.humancloud.co.in
+      paths: ["/"]
+

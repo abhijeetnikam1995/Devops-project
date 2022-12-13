@@ -1,0 +1,10 @@
+stages:
+    - helm-deploy
+
+helm-add:
+    stage: helm-deploy
+    script:
+       - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com:humancloud/helm-charts.git
+       - helm upgrade --install nginx-ingress-controller ingress-nginx/ -n converge-dev 
+    tags:
+       - HCT-Converge

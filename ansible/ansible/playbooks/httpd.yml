@@ -1,0 +1,8 @@
+-
+ hosts: webservers
+ tasks:         
+ - name: Installing httpd
+   service: name=httpd enabled=yes
+   enabled: yes
+   state: started
+   copy: src=/root/index.html dest=/var/www/html/index.html

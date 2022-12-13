@@ -1,0 +1,15 @@
+name: "converge-identity-dev"
+nameOverride: "converge-identity-dev"
+secretName: "registry-credentials"
+containerPort: 5000
+externalPort: 80
+ingress:
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+#    - host: a5e90eaf9aec84d90914f55a47c79b35-2007182703.ap-south-1.elb.amazonaws.com
+    - host: app.humancloud.co.in
+      paths: ["/identity"]
+

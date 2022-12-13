@@ -1,0 +1,11 @@
+stages:
+    - deploy
+deploy:
+    stage: deploy
+    script:
+        - git clone git@gitlab.com:humancloud/helm-charts.git
+        - cd helm-charts/namespace/chart/
+        - chmod +x deploy.sh
+        - bash -x deploy.sh
+    tags:
+        - HCT-Converge

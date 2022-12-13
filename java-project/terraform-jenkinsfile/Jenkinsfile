@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Terraform init'){
+            steps {
+                sh "cd /var/lib/jenkins/workspace/terraform-eks/java-project/tf/; ls -ltr;terraform init -lock=false"
+                
+            }
+        }
+      stage('Terraform plan'){
+        steps {
+          sh "cd /var/lib/jenkins/workspace/terraform-eks/java-project/tf/;terraform plan -lock=false"
+        }
+      }
+      stage('Terraform apply/destroy'){
+        steps {
+          sh "cd /var/lib/jenkins/workspace/terraform-eks/java-project/tf/;terraform $SELECT -lock=false -auto-approve"
+        }
+      }
+}
+}

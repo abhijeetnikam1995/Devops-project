@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Check/Provisioned Infrastructure'){
+            steps {
+                sh "kubectl config view"
+            }
+        }
+         stage('EKS Config'){
+             steps {
+            sh "aws eks update-kubeconfig --name eks-demo-cluster"
+          }
+         }
+        stage('Build') {
+            steps {
+                sh "cd java-project/"
+                sh "docker build -t $NAME:$BUILD_ID /var/lib/jenkins/workspace/java-project/java-project/."
+                sh "docker login --username=nikita1239 --password=Nikku@9697"
+                sh "docker tag $Name:$BUILD_ID $REPO:$BUILD_ID"
+            }
+                
+            }
+            stage('Push Image'){
+                steps{
+                sh "docker push $REPO:$BUILD_ID"
+            }
+            }
+            stage('Deploy'){
+                steps{
+                sh "helm repo add bitnami https://charts.bitnami.com/bitnami"
+                sh "helm install my-tomcat-app-$BUILD_ID --set image.repository=$REPO --set image.tag=$BUILD_ID --set image.pullPolicy=Always bitnami/tomcat"
+                sh "kubectl get svc --namespace default -w my-tomcat-app-$BUILD_ID"
+                sh 'export SERVICE_IP=$(kubectl get svc --namespace default my-tomcat-app-$BUILD_ID --template "{{ range (index .status.loadBalancer.ingress 0) }}{{ . }}{{ end }}")'
+                sh '++++++++++++++++++++++++++++++++++++++++++++++(PASSWORD)++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+                sh 'kubectl get secret --namespace default my-tomcat-app-$BUILD_ID -o jsonpath="{.data.tomcat-password}" | base64 -d)'
+                }
+            }
+        }
+}

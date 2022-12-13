@@ -1,0 +1,67 @@
+image:
+  name: hashicorp/terraform:light
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+# Default output file for Terraform plan
+variables:
+  PLAN: plan.tfplan
+  JSON_PLAN_FILE: tfplan.json
+  TF_IN_AUTOMATION: "true"
+
+cache:
+  key: "default"
+  paths:
+    - .terraform
+
+before_script:
+  - rm -rf terraform-vpc-module/.terraform
+  - cd tf/
+  - terraform --version
+  - terraform init -upgrade 
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+validate:
+  stage: validate
+  script:
+    - terraform validate
+  tags:
+   - test-p11
+
+merge review:
+  stage: plan
+  script:
+    - terraform plan -out=$PLAN -lock=false
+  tags:
+   - test-p11
+
+plan:
+  stage: plan
+  script:
+    - terraform plan -lock=false
+  tags:
+   - test-p11
+
+apply:
+  stage: apply
+  script:
+    - terraform apply -lock=false -auto-approve
+  tags:
+   - test-p11
+  when:
+    manual
+
+destroy:
+  stage: destroy
+  script:
+    - terraform destroy -lock=false -auto-approve
+  tags:
+   - test-p11
+  when:
+    manual

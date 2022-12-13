@@ -1,0 +1,13 @@
+name: "converge-identity-dev"
+nameOverride: "converge-identity-dev"
+secretName: "marketplace-imagepullsecret"
+containerPort: 5000
+externalPort: 80
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: app.humancloud.co.in
+      paths: ["/identity"]

@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: eks-test-uat
+  namespace: uat
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: a481059493aa64f0cbed5c89d4eb6498-1066689816.us-west-2.elb.amazonaws.com
+    http:
+      paths:
+      - path: /uat
+        pathType: Prefix
+        backend:
+          service:
+            name: eks-test-uat
+            port:
+              number: 80

@@ -1,0 +1,30 @@
+stages:
+  - build
+  - push-image
+  - deploy
+variables:
+  CI_REGISTRY_DOCKER: "$CI_REGISTRY_IMAGE/$(echo $CI_COMMIT_BRANCH | awk '{print tolower($0)}')"
+build:
+  stage: build
+  script:
+    - sudo docker login $CI_REGISTRY
+    - bash +x /home/gitlab-runner/ssmget.sh /$(echo $CI_COMMIT_BRANCH | awk '{print tolower($0)}')-identity
+    - sudo docker build -t $CI_REGISTRY_DOCKER .
+  tags:
+    - HCT-Converge	
+
+push-image:
+  stage: push-image
+  script:
+    - sudo docker push $CI_REGISTRY_DOCKER
+  tags:
+    - HCT-Converge
+
+deploy:
+  stage: deploy 
+  script:
+    - git clone --branch dev git@gitlab.com:humancloud/helm-charts.git
+    - helm upgrade --install identity helm-charts/services/ --values helm-charts/services/converge-identity-values.yaml --set imagePullSecrets.auth=$gitlab_pull_secret --set image.repository=$CI_REGISTRY_DOCKER -n converge-$(echo $CI_COMMIT_BRANCH | awk '{print tolower($0)}')
+  tags:
+    - HCT-Converge
+  when: manual
